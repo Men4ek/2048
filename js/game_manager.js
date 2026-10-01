@@ -241,26 +241,28 @@ GameManager.prototype.movesAvailable = function () {
 
 // Check for available matches between tiles (more expensive check)
 GameManager.prototype.tileMatchesAvailable = function () {
-  var self = this;
-
-  var tile;
-
   for (var x = 0; x < this.size; x++) {
     for (var y = 0; y < this.size; y++) {
-      tile = this.grid.cellContent({ x: x, y: y });
+      var tile = this.grid.cellContent({ x: x, y: y });
 
-      if (tile) {
-        for (var direction = 0; direction < 4; direction++) {
-          var vector = self.getVector(direction);
-          var cell   = { x: x + vector.x, y: y + vector.y };
-
-          var other  = self.grid.cellContent(cell);
-
-          if (other && other.value === tile.value) {
-            return true; // These two tiles can be merged
-          }
-        }
+      if (tile && this.hasMatchingNeighbor(tile, x, y)) {
+        return true;
       }
+    }
+  }
+
+  return false;
+};
+
+// Check the four neighbors without changing the board.
+GameManager.prototype.hasMatchingNeighbor = function (tile, x, y) {
+  for (var direction = 0; direction < 4; direction++) {
+    var vector = this.getVector(direction);
+    var cell = { x: x + vector.x, y: y + vector.y };
+    var other = this.grid.cellContent(cell);
+
+    if (other && other.value === tile.value) {
+      return true;
     }
   }
 
